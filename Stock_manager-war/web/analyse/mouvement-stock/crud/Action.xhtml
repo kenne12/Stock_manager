@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form id="actionsForm">
+
+        <div class="footer-section">
+            
+            <h:panelGrid columns="12" >
+
+                <p:outputLabel value="#{langue.critere}" for="critere"/>
+                <p:selectOneMenu id="critere" value="#{mouvementstockController.critere}" required="true">
+                    <f:selectItem itemLabel="#{langue.tout}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{langue.mois}" itemValue="2"/>
+                    <f:selectItem itemLabel="#{langue.client}" itemValue="3"/>
+                    <f:selectItem itemLabel="#{langue.date}" itemValue="4"/>
+                    <f:selectItem itemLabel="#{langue.intervalle}" itemValue="5"/>
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" listener="#{mouvementstockController.updateCritere()}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu rendered="#{mouvementstockController.showClient}" value="#{mouvementstockController.client.idclient}" required="true">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{mouvementstockController.clients}" var="client" itemLabel="#{client.nom} #{client.prenom}" itemValue="#{client.idclient}"/>
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" listener="#{mouvementstockController.updateClient()}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu rendered="#{mouvementstockController.showMois}" value="#{mouvementstockController.anneeMois.idAnneeMois}" required="true">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{mouvementstockController.anneeMoises}" var="mois" itemLabel="#{mois.idmois.nom} - #{mois.idannee.nom}" itemValue="#{mois.idAnneeMois}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu rendered="#{mouvementstockController.showDateInterval}" value="#{mouvementstockController.date_interval}" required="true">
+                    <f:selectItem itemLabel="#{langue.intervalle}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{langue.date}" itemValue="2"/>
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" listener="#{mouvementstockController.updateDateInterl()}"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel rendered="#{mouvementstockController.showDate}" value="#{langue.date}" for="date"/>
+                <p:calendar rendered="#{mouvementstockController.showDate}" id="date" value="#{mouvementstockController.date}" navigator="true" pattern="dd/MM/yyyy" required="true">
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" event="dateSelect" listener="#{mouvementstockController.updateDate()}" />
+                </p:calendar>
+
+                <p:outputLabel rendered="#{mouvementstockController.showDateDebut}" value="#{langue.debut}" for="date_debut"/>
+                <p:calendar rendered="#{mouvementstockController.showDateDebut}" id="date_debut" value="#{mouvementstockController.dateDebut}" navigator="true" pattern="dd/MM/yyyy" required="true">
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" event="dateSelect" listener="#{mouvementstockController.updateDate()}" />
+                </p:calendar>
+
+                <p:outputLabel rendered="#{mouvementstockController.showDateFin}" value="#{langue.fin}" for="date_fin"/>
+                <p:calendar rendered="#{mouvementstockController.showDateFin}" id="date_fin" value="#{mouvementstockController.dateFin}" navigator="true" pattern="dd/MM/yyyy" required="true">
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" event="dateSelect" listener="#{mouvementstockController.updateDate()}" />
+                </p:calendar>
+
+            </h:panelGrid>
+
+            <p:separator/>
+
+            <center>
+                <p:commandButton id="btn_search" 
+                                 update=":FactureListerForm:datalist,:notify1,imprimer" 
+                                 value="#{langue.rechercher}" 
+                                 onclick="PF('AjaxNotifyDialog').show()" 
+                                 actionListener="#{mouvementstockController.rechercher()}"/>
+
+                <p:commandButton id="imprimer" icon="ui-icon-print"  
+                                 value="#{langue['Conv.Imprimer']}" 
+                                 actionListener="#{mouvementstockController.printHistoric()}"
+                                 disabled="#{mouvementstockController.imprimer}"
+                                 update=":FactureImprimerDlg,:notify1"
+                                 onclick="PF('AjaxNotifyDialog').show()"/> 
+            </center>
+            <p:separator/>
+
+        </div>
+
+    </h:form>
+</ui:composition>

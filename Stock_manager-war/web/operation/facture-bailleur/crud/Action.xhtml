@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="actionsForm">
+
+        <div class="footer-section">
+
+            <p:commandButton id="creer"  icon="ui-icon-plus"   
+                             value="#{langue['Conv.Creer']}" 
+                             actionListener="#{factureBailleurController.prepareCreate()}"
+                             update=":CommandeCreateForm,:notify1"/>
+
+            <p:commandButton id="detail"   
+                             icon="ui-icon-search" 
+                             value="#{langue['Conv.Detail']}" 
+                             update=":FactureDetailForm,:notify1" 
+                             oncomplete="PF('FactureDetailDialog').show()" 
+                             actionListener="#{factureBailleurController.prepareview()}"
+                             disabled="#{factureBailleurController.detail}"/>
+
+            <p:commandButton id="modifier"   
+                             icon="ui-icon-pencil" 
+                             value="#{langue['Conv.Modifier']}" 
+                             actionListener="#{factureBailleurController.prepareEdit()}"
+                             update=":CommandeCreateForm,:notify1"
+                             disabled="#{factureBailleurController.modifier}"/>
+
+            <p:commandButton id="supprimer" 
+                             icon="ui-icon-trash"  
+                             value="#{langue['Conv.Supprimer']}" 
+                             update=":FactureListerForm:datalist,actionsForm,:notify1"
+                             disabled="#{factureBailleurController.supprimer}"
+                             actionListener="#{factureBailleurController.delete()}">
+                <p:confirm header="#{langue['Titre.Dlg.Confirm']}"
+                           message="#{langue['Message.Confirm.Supprimer']}?"
+                           icon="ui-icon-alert"/>
+            </p:commandButton>
+
+            <p:commandButton id="imprimer" 
+                             immediate="true"
+                             ajax="false"
+                             icon="ui-icon-print"
+                             value="#{langue['Conv.Imprimer']}" 
+                             action="#{factureBailleurController.print()}"
+                             disabled="#{factureBailleurController.imprimer}"/>
+
+        </div>
+
+    </h:form>
+</ui:composition>

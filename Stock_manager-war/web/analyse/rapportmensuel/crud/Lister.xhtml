@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="ReportMListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <h3 class="page-header">#{langue.rapport_mensuel_vente}</h3>
+        <br/>
+
+        <center>
+            <p:panelGrid columns="6">
+
+                <p:outputLabel value="#{langue.exercice}" for="annee" />
+                <p:selectOneMenu required="true" id="annee" value="#{rapportHebdomadaireController.annee.idannee}">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{rapportHebdomadaireController.annees}" var="annee" itemLabel="#{annee.nom}" itemValue="#{annee.idannee}"/>                                                                             
+                    <p:ajax listener="#{rapportHebdomadaireController.filterMois()}" update="mois"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel value="#{langue.mois}" for="mois" />
+                <p:selectOneMenu required="true" id="mois" value="#{rapportHebdomadaireController.anneeMois.idAnneeMois}">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{rapportHebdomadaireController.anneeMoises}" var="mois" itemLabel="#{mois.idmois.nom}" itemValue="#{mois.idAnneeMois}"/>                                                                             
+                    <p:ajax update="datalist,print,:notify1" listener="#{rapportHebdomadaireController.find()}"/>
+                </p:selectOneMenu>
+
+                <p:commandButton  icon="ui-icon-search"   
+                                  value="#{langue.rechercher}" 
+                                  actionListener="#{rapportHebdomadaireController.find()}"
+                                  update="datalist,print,:notify1"/>
+
+                <p:commandButton id="print"  icon="ui-icon-print"   
+                                 value="#{langue.imprimer}"
+                                 onclick="PF('AjaxNotifyDialog').show()"
+                                 disabled="#{rapportHebdomadaireController.showPrintButton}"
+                                 actionListener="#{rapportHebdomadaireController.printReport()}"
+                                 update=":ReportMImprimerDlg,growl,:notify1"/>                              
+            </p:panelGrid>
+        </center>
+
+        <p:separator/>
+
+        <p:panel header="#{langue.liste_articles_vendus}">
+
+            <p:dataTable id="datalist"
+                         value="#{rapportHebdomadaireController.commandes}"
+                         var="item"
+                         paginator="true"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,30,40,50">
+
+                <p:column filterBy="#{item.idfacture.dateAchat}" width="12%">
+                    <f:facet name="header">
+                        <h:outputText value="Date"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idfacture.dateAchat}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column filterBy="#{item.idproduit.nom}" width="40%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.article}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idproduit.nom}"/>
+                </p:column>
+
+                <p:column style="text-align: right" filterBy="#{item.montant}">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.prix}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.montant}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="text-align: center" filterBy="#{item.quantite}">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.quantite}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantite}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="text-align: right" filterBy="#{item.quantite}">
+                    <f:facet name="header">
+                        <h:outputText value="Total"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantite * item.montant}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="3" style="text-align:right" footerText="#{langue.totaux}" />               
+                        <p:column style="text-align: center" footerText="#{rapportHebdomadaireController.calculSommeQuantite()}" />
+                        <p:column style="text-align: right" footerText="#{rapportHebdomadaireController.calculSommeMontant()}" />
+                    </p:row>
+                </p:columnGroup>
+
+            </p:dataTable>
+
+        </p:panel>
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="220" width="600" resizable="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{rapportHebdomadaireController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{rapportHebdomadaireController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{rapportHebdomadaireController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+
+</ui:composition>

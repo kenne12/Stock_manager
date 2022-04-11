@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="TypeMatiereListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <p:panelGrid columns="6">
+
+
+            <p:commandButton id="print"  icon="ui-icon-print"   
+                             value="Imprimer" 
+                             actionListener="#{achatController.print()}"
+                             update=":TypeMatiereImprimerDlg,growl" 
+                             />
+
+        </p:panelGrid>
+
+        <p:panel header="LISTE DE TOUT LES APPROVISIONNEMENTS">
+
+            <p:dataTable id="datalist"
+                         value="#{achatController.stockProduits}"
+                         var="item"
+                         paginator="true"
+                         rows="50"
+                         rowsPerPageTemplate="10,20,30,40,50">
+
+                <p:ajax event="rowSelect"   update="datalist"/>
+
+                <p:column filterBy="#{item.idproduit.nom}" width="40%">
+                    <f:facet name="header">
+                        <h:outputText value="Produit"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idproduit.nom}"/>
+                </p:column>
+
+
+                <p:column style="text-align: center" filterBy="#{item.prixAcquisition}">
+                    <f:facet name="header">
+                        <h:outputText value="Prix achat"/>
+                    </f:facet>
+                    <h:outputText value="#{item.prixAcquisition}"/>
+                </p:column>
+
+
+                <p:column style="text-align: center" filterBy="#{item.quantite}">
+                    <f:facet name="header">
+                        <h:outputText value="Quantité"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantite}"/>
+                </p:column>
+
+                <p:column style="text-align: center" filterBy="#{item.quantite}">
+                    <f:facet name="header">
+                        <h:outputText value="Total"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantite * item.prixAcquisition}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="2" style="text-align:right" footerText="Totaux" />                                       
+                        <p:column style="text-align: center" footerText="#{achatController.calculQuantite()}"/>
+                        <p:column style="text-align: center" footerText="#{achatController.calculTotal()}" />
+                    </p:row>
+                </p:columnGroup>
+
+            </p:dataTable>
+
+        </p:panel>
+    </h:form>
+
+</ui:composition>

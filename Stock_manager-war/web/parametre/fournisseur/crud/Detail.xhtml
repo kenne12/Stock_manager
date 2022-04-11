@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="TypeMatiereDetailDlg" 
+                  widgetVar="typeMatiereDetailDialog" 
+                  modal="true" resizable="false"  
+                  appendTo="@(body)" 
+                  visible="#{fournisseurController.showUserDetailDialog}"
+                  header="#{langue['Titre.Dlg.Detail']}: #{langue.fournisseur}" closeOnEscape="true">
+
+            <h:form id="TypeMatiereDetailForm">
+
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" columnClasses="column" style="width: 100%;" >
+
+                        <h:outputText value="#{langue.nom} / #{langue.raison_sociale}"/>
+                        <h:outputText value="#{fournisseurController.fournisseur.raisonSociale}"/>
+
+                        <h:outputText value="#{langue.telephone_1}"/>
+                        <h:outputText value="#{fournisseurController.fournisseur.contact1}"/>
+
+                        <h:outputText value="#{langue.telephone_2}"/>
+                        <h:outputText value="#{fournisseurController.fournisseur.contact2}"/>
+
+                        <h:outputText value="#{langue.adresse}"/>
+                        <h:outputText value="#{fournisseurController.fournisseur.adresse}"/>
+
+                        <h:outputText value="#{langue.email}"/>
+                        <h:outputText value="#{fournisseurController.fournisseur.email}"/>
+
+                        <h:outputText value="#{langue.site_web}"/>
+                        <h:outputText value="#{fournisseurController.fournisseur.siteWeb}"/>
+
+                    </p:panelGrid>
+                    <p:commandButton value="#{langue['Conv.Fermer']}" onclick="PF('TypeMatiereDetailDialog').hide()"/>
+                </h:panelGroup>
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

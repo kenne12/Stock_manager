@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form id="FactureListerForm">
+
+        <h:panelGroup >            
+
+            <center>
+
+                <p:selectOneMenu value="#{statisticclientController.annee.idannee}">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{statisticclientController.annees}" var="item" itemLabel="#{item.nom}" itemValue="#{item.idannee}"/>
+                    <p:ajax update="FactureListerForm" listener="#{statisticclientController.update()}"/>
+                </p:selectOneMenu>
+
+                <br/>
+
+                <p:selectManyMenu  style="width: 700px ; text-align: left"  filter="true" showCheckbox="true" filterMatchMode="contains" value="#{statisticclientController.selectedClients}" required="true" converter="clientConverter" requiredMessage="Veuillez selectionner" converterMessage="Veuillez selectionner">
+                    <f:selectItems value="#{statisticclientController.clients}" var="client" itemLabel="#{client.nom}" itemValue="#{client}" />
+                    <p:ajax update="FactureListerForm" listener="#{statisticclientController.update()}"/>
+                </p:selectManyMenu>
+
+            </center>
+            <p:separator/>
+
+            <p:chart type="line" model="#{statisticclientController.lineModel2}" style="height:800px;"/>
+
+        </h:panelGroup>
+    </h:form>
+
+</ui:composition>

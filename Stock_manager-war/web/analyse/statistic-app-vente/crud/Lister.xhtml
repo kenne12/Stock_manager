@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form id="FactureListerForm">
+
+        <h:panelGroup >            
+
+            <center>
+                <p:selectOneMenu value="#{statisticController.annee.idannee}">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{statisticController.annees}" var="item" itemLabel="#{item.nom}" itemValue="#{item.idannee}"/>
+                    <p:ajax update="FactureListerForm" listener="#{statisticController.update()}"/>
+                </p:selectOneMenu>
+            </center>
+            <p:separator/>
+
+            <p:chart type="line" model="#{statisticController.lineModel2}" style="height:400px;"/>
+
+            <p:separator/>
+            <p:chart type="bar" model="#{statisticController.barModel}" style="height:400px"/>
+
+        </h:panelGroup>
+    </h:form>
+
+</ui:composition>

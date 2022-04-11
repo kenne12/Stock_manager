@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition>
+        <p:dialog id="StockCreateDlg" 
+                  widgetVar="StockCreateDialog" modal="true" 
+                  resizable="true" appendTo="@(body)" 
+                  width="80%"
+                  height="600px"
+                  header="CREER / MODIFIER UNE NOUVELLE APPROVISIONNEMENT EN STOCK">
+            <h:form id="StockCreateForm">
+                <h:panelGroup id="display">
+
+                    <p:panelGrid style="width: 80%;margin-left: 10%;" columns="2">
+
+                        <p:outputLabel value="#{langue.date}" for="date" />
+                        <p:calendar pattern="dd/MM/yyyy" disabled="true" required="true" id="date" mindate="#{stockController.anneeMois.dateDebut}" maxdate="#{stockController.anneeMois.dateFin}" value="#{stockController.stock.dateAchat}" navigator="true" requiredMessage="#{langue.valeur_obligatoire}">
+                            <p:ajax/>  
+                        </p:calendar>
+
+                        <p:outputLabel value="#{langue.fournisseur}" for="fournisseur" />
+                        <p:selectOneMenu required="true" filter="true" id="fournisseur" value="#{stockController.fournisseur.idfournisseur}" requiredMessage="#{langue.valeur_obligatoire}">
+                            <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                            <f:selectItems value="#{stockController.fournisseurs}" var="clt" itemLabel="#{clt.raisonSociale}" itemValue="#{clt.idfournisseur}"/>                                                                             
+                            <p:ajax  />
+                        </p:selectOneMenu>
+
+                    </p:panelGrid>
+
+                    <p:separator style="width: 98%;margin-left: 1%"/>
+
+                    <p:panelGrid id="info_1" style="width: 70%;margin-left: 15%;" columns="4">
+
+                        <p:outputLabel for="total_1" value="Total"/>
+                        <p:outputLabel id="total_1" value="#{stockController.total}">                               
+                            <f:convertNumber />
+                        </p:outputLabel>
+                        <p:commandButton icon="fa fa-calculator" value="#{langue.calculer}" actionListener="#{stockController.updateTotal()}" update=":StockCreateForm:info_1,:StockCreateForm:info_2" partialSubmit="true"/>
+                        <p:commandButton icon="ui-icon-plus" value="#{langue.ajouter_un_article}"  actionListener="#{stockController.prepareCreateCommande()}" oncomplete="PF('AddarticleCreateDialog').show()" update=":AddarticleCreateForm"/>
+                    </p:panelGrid>
+
+                    <p:separator style="width: 98%;margin-left: 1%;color: red;"/>
+
+                    <p:dataTable id="datalist" value="#{stockController.stockProduits}" var="item"                             
+                                 paginator="true"
+                                 editable="true" 
+                                 rowKey="#{item.idStockProduit}"
+                                 rows="15"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 style="width: 95%;margin-left: 2.5%;margin-top: 2%;font-weight: bold"
+                                 rowIndexVar="index"
+                                 emptyMessage="#{langue.tableau_vide}"
+                                 widgetVar="fonctionTable"
+                                 draggableColumns="true"
+                                 resizableColumns="true">
+
+                        <f:facet name="header"> 
+                            <h:outputText value="LISTE DES PRODUITS DE LA COMMANDE"/>
+                        </f:facet> 
+
+                        <p:column style="width: 25%" filterBy="#{item.idproduit.nom}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.article}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idproduit.nom}"/>
+                        </p:column>
+
+                        <p:column style="width: 20%" filterBy="#{item.idlot.numeroLot}">
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.lot}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idlot.numeroLot}"/>
+                        </p:column>
+
+                        <p:column style="width: 7%;text-align: center" headerText="#{langue.quantite}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{item.quantite}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:inputText required="true" value="#{item.quantite}">                                             
+                                        <p:ajax event="keyup" listener="#{stockController.updateTotal()}" update=":StockCreateForm:info_1,:StockCreateForm:info_2"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column filterBy="#{item.prixAcquisition}" style="width: 12%;text-align: right" headerText="#{langue.prix_unitaire}">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{item.prixAcquisition}" >
+                                        <f:convertNumber />
+                                    </h:outputText>    
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText required="true" value="#{item.prixAcquisition}">
+                                        <f:convertNumber />
+                                        <p:ajax event="keyup" listener="#{stockController.updateTotal()}" update=":StockCreateForm:info_1,:StockCreateForm:info_2"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column style="width: 14%;text-align: right" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.montant_total}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.prixAcquisition * item.quantite}">
+                                <f:convertNumber />
+                            </h:outputText>  
+                        </p:column>
+
+                        <p:column headerText="#{langue.modifier}" style="width:8%;text-align: center">
+                            <p:rowEditor/>
+                        </p:column>
+
+                        <p:column style="width: 12%;text-align: center" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.action}"/>
+                            </f:facet>
+                            <p:commandButton icon="ui-icon-trash">
+                                <p:ajax event="click" listener="#{stockController.removeProduit(item)}" update="datalist,:StockCreateForm:info_1,:StockCreateForm:info_2,:StockListerForm:msg"/>
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <p:separator style="width: 98%;margin-left: 1%"/>
+
+                    <p:panelGrid id="info_2" style="width: 70%;margin-left: 15%;" columns="4">
+
+                        <p:outputLabel for="total_2" value="Total"/>
+                        <p:outputLabel id="total_2" value="#{stockController.total}">                               
+                            <f:convertNumber />
+                        </p:outputLabel>
+                        <p:commandButton icon="fa fa-calculator" value="#{langue.calculer}" actionListener="#{stockController.updateTotal()}" update=":StockCreateForm:info_1,:StockCreateForm:info_2" partialSubmit="true"/>
+                        <p:commandButton icon="ui-icon-plus" value="#{langue.ajouter_un_article}"  actionListener="#{stockController.prepareCreateCommande()}" oncomplete="PF('AddarticleCreateDialog').show()" update=":AddarticleCreateForm"/>
+
+                    </p:panelGrid>
+
+                    <br/>
+
+                    <p:separator/>
+
+                    <p:commandButton actionListener="#{stockController.create()}" 
+                                     style="float: right;" icon="ui-icon-check"
+                                     value="#{langue.valider}" 
+                                     update="display,:StockListerForm,:actionsForm,:notify1" 
+                                     onclick="PF('AjaxNotifyDialog').show()"/>
+                    <p:commandButton style="float: left; color: red;" icon="ui-icon-close" value="#{langue.annuler}" oncomplete="PF('StockCreateDialog').hide()" partialSubmit="true"/>
+
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

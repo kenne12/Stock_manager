@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="FactureListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <p:growl id="msg"/>
+
+        <p:panel header="#{langue['Conv.ListeDes']} : #{langue.factures}">            
+            <p:dataTable id="datalist"
+                         value="#{rapportController.factures}"
+                         var="item"
+                         rowKey="#{item.idfacture}"
+                         paginator="true"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,30,40,50">
+
+                <p:column filterBy="#{item.idclient.nom} #{item.idclient.prenom}" width="25%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.client}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idclient.nom} #{item.idclient.prenom}"/>
+                </p:column>
+
+                <p:column filterBy="#{item.numeroFacture}" width="17%" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.numero_facture}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.numeroFacture}"/>
+                </p:column>  
+
+                <p:column filterBy="#{item.montant}" style="text-align: right;width: 10%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.montant_total}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.montantTtc}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column filterBy="#{item.montantPaye}" style="text-align: right;width: 10%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.montant_paye}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.montantPaye}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="text-align: center;width: 10%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.date}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dateAchat}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>   
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="width: 18%;text-align: center" >
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.action}"/>
+                    </f:facet>
+                    <p:commandButton icon="ui-icon-print" value="#{langue.imprimer}" >
+                        <p:ajax event="click" listener="#{rapportController.initPrinter(item)}" update=":FactureImprimerDlg,:notify1"/>
+                    </p:commandButton>
+
+                    <p:commandButton icon="ui-icon-search">
+                        <p:ajax event="click" listener="#{rapportController.initView(item)}" update=":FactureDetailDlg,:notify1"/>                      
+                    </p:commandButton>
+
+                </p:column>
+
+            </p:dataTable>
+
+        </p:panel>
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="220" width="600" resizable="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{rapportController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{rapportController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{rapportController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+</ui:composition>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="FactureListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <p:growl id="msg"/>
+
+        <p:panel header="#{langue['Conv.ListeDes']} : #{langue.mouvement_stock}">            
+            <p:dataTable id="datalist"
+                         value="#{mouvementstockController.ligneMvtStocks}"
+                         var="item"
+                         rowKey="#{item.idLigneMvtStock}"
+                         paginator="true"
+                         rows="50"
+                         rowsPerPageTemplate="10,20,30,40,50">
+
+                <p:column style="width: 10%;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.date}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idMvtStock.dateMvt}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/> 
+                    </h:outputText>
+                </p:column>
+
+                <p:column filterBy="#{item.idlot.numeroLot}" width="17%" style="">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.numero_lot}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idlot.numeroLot}"/>
+                </p:column>  
+
+                <p:column filterBy="#{item.quantiteEntree}" style="text-align: right;width: 8%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.qte_entree}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantiteEntree}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column filterBy="#{item.fournisseur}" style="width: 20%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.provenance}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.fournisseur}"/>
+                </p:column>
+
+                <p:column style="text-align: center;width: 10%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.qte_sortie}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantiteSortie}"/>               
+                </p:column>
+                
+                <p:column style="width: 20%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.destination}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.client}"/>               
+                </p:column>
+                
+                <p:column style="text-align: center;width: 10%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.quantite_en_stock}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.reste}"/>               
+                </p:column>
+                
+            </p:dataTable>
+
+        </p:panel>
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="220" width="600" resizable="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{mouvementstockController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{mouvementstockController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{mouvementstockController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+</ui:composition>

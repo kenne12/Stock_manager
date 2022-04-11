@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="ReportJListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+        
+        <h3 class="page-header">#{langue.rapport_journalier_vente}</h3>
+        <br/>
+
+        <center>
+            <p:panelGrid columns="6">
+
+                <p:outputLabel value="Date"/>
+                <p:calendar value="#{rapportJournalierController.date}" navigator="true" pattern="dd/MM/yyyy">
+                    <p:ajax event="dateSelect" update="datalist,print,:notify1" listener="#{rapportJournalierController.find()}"/>
+                </p:calendar>
+
+                <p:commandButton  icon="ui-icon-search"   
+                                  value="#{langue.rechercher}" 
+                                  actionListener="#{rapportJournalierController.find()}"
+                                  update="datalist,print,:notify1"/>
+
+                <p:commandButton id="print" icon="ui-icon-print"   
+                                 value="#{langue.imprimer}" 
+                                 onclick="PF('AjaxNotifyDialog').show()"
+                                 disabled="#{rapportJournalierController.showPrintButton}"
+                                 actionListener="#{rapportJournalierController.printReport()}"
+                                 update=":ReportJImprimerDlg,:notify1"/>                       
+            </p:panelGrid>
+        </center>
+
+        <p:separator/>
+
+        <p:panel header="#{langue.liste_articles_vendus}">
+
+            <p:dataTable id="datalist"
+                         value="#{rapportJournalierController.commandes}"
+                         var="item"
+                         paginator="true"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,30,40,50">
+
+                <p:column filterBy="#{item.idproduit.nom}" width="40%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.article}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idproduit.nom}"/>
+                </p:column>
+
+                <p:column style="text-align: right" filterBy="#{item.montant}">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.prix}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.montant}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="text-align: center" filterBy="#{item.quantite}">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.quantite}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantite}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="text-align: right">
+                    <f:facet name="header">
+                        <h:outputText value="Total"/>
+                    </f:facet>
+                    <h:outputText value="#{item.quantite * item.montant}">
+                        <f:convertNumber/>
+                    </h:outputText>
+                </p:column>
+
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="2" style="text-align:right" footerText="#{langue.totaux}" />               
+                        <p:column style="text-align: center" footerText="#{rapportJournalierController.calculSommeQuantite()}" />
+                        <p:column style="text-align: right" footerText="#{rapportJournalierController.calculSommeMontant()}" />
+                    </p:row>
+                </p:columnGroup>
+
+            </p:dataTable>
+
+        </p:panel>
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="220" width="600" resizable="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{rapportJournalierController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{rapportJournalierController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{rapportJournalierController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+</ui:composition>

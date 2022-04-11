@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition>
+        <p:dialog id="CommandeCreateDlg" 
+                  widgetVar="CommandeCreateDialog" 
+                  modal="true" 
+                  resizable="true" 
+                  appendTo="@(body)"
+                  header="#{langue.commande_fournisseur}"
+                  width="80%"
+                  height="570">
+
+            <h:form id="CommandeCreateForm">
+
+                <h:panelGroup id="display">
+
+                    <center>
+                        <br/>
+
+                        <h:panelGrid style="" columns="2">
+
+                            <p:outputLabel  value="#{langue.fournisseur}" for="fournisseur" />
+                            <p:selectOneMenu filter="true" required="true" id="fournisseur" value="#{commandeFournisseurController.fournisseur.idfournisseur}" requiredMessage="#{langue.valeur_obligatoire}">
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                                <f:selectItems value="#{commandeFournisseurController.fournisseurs}" var="clt" itemLabel="#{clt.raisonSociale}" itemValue="#{clt.idfournisseur}"/>                                                                             
+                                <p:ajax/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="#{langue.date_commande}" for="date_commande" />
+                            <p:calendar pattern="dd/MM/yyyy" disabled="false" mindate="#{commandeFournisseurController.anneeMois.dateDebut}" maxdate="#{commandeFournisseurController.anneeMois.dateFin}" required="true" id="date_commande" value="#{commandeFournisseurController.commandeFournisseur.dateCmde}" navigator="true" requiredMessage="#{langue.valeur_obligatoire}">
+                                <p:ajax/>  
+                            </p:calendar>
+
+                            <p:outputLabel value="#{langue.date_livraison_previsionnelle}" for="date_livraison_prev" />
+                            <p:calendar pattern="dd/MM/yyyy" disabled="false" mindate="#{commandeFournisseurController.anneeMois.dateDebut}" maxdate="#{commandeFournisseurController.anneeMois.dateFin}" required="true" id="date_livraison_prev" value="#{commandeFournisseurController.commandeFournisseur.dateLivraisonPrev}" navigator="true" requiredMessage="#{langue.valeur_obligatoire}">
+                                <p:ajax/>  
+                            </p:calendar>
+
+                            <p:outputLabel value="#{langue.taxe_et_remise}"  />
+                            <h:panelGrid columns="4">                                    
+                                <p:outputLabel value="#{langue.taux_tva}"/>
+                                <p:outputLabel value="#{commandeFournisseurController.commandeFournisseur.tauxTva}%" style="color: red"/>
+
+                                <p:outputLabel value="#{langue.taux_remise}"/>
+                                <p:outputLabel value="#{commandeFournisseurController.commandeFournisseur.tauxRemise}%" style="color: red"/>                                    
+                            </h:panelGrid>
+
+                            <p:outputLabel value="#{langue.calcul_tva} ?" for="calcul_tva" />
+                            <h:selectBooleanCheckbox value="#{commandeFournisseurController.commandeFournisseur.calculTva}" id="calcul_tva">
+                                <p:ajax update="info_1,info_2" listener="#{commandeFournisseurController.updateCalculTva()}"/>
+                            </h:selectBooleanCheckbox>
+
+                            <p:outputLabel value="#{langue.calcul_remise} ?" for="calcul_remise" />
+                            <h:selectBooleanCheckbox value="#{commandeFournisseurController.commandeFournisseur.calculRemise}" id="calcul_remise">
+                                <p:ajax update="info_1,info_2" listener="#{commandeFournisseurController.updateCalculTva()}"/>
+                            </h:selectBooleanCheckbox>
+                        </h:panelGrid>
+
+                    </center>
+
+                    <p:separator style="width: 98%;margin-left: 1%"/>
+
+                    <center>
+                        <p:panelGrid id="info_1" columns="10">
+
+                            <p:outputLabel for="total1" value="#{langue.total_ht}"/>
+                            <p:outputLabel id="total1" value="#{commandeFournisseurController.total}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="tva1" value="#{langue.tva}"/>
+                            <p:outputLabel id="tva1" value="#{commandeFournisseurController.commandeFournisseur.montantTva}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="remise1" value="#{langue.remise}"/>
+                            <p:outputLabel id="remise1" value="#{commandeFournisseurController.commandeFournisseur.montantRemise}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="montant_ttc1" value="#{langue.total_ttc}"/>
+                            <p:outputLabel id="montant_ttc1" value="#{commandeFournisseurController.commandeFournisseur.montantTtc}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:commandButton value="#{langue.calculer}" icon="fa fa-calculator" actionListener="#{commandeFournisseurController.updateTotal()}" update="info_2,info_1"/>
+
+                            <p:commandButton icon="ui-icon-plus" value="#{langue.ajouter_article}" update=":ArticleCreateForm"  actionListener="#{commandeFournisseurController.prepareCreateCommande()}"/>
+                        </p:panelGrid>
+                    </center>
+                    <br/>
+
+                    <p:dataTable id="datalist" 
+                                 value="#{commandeFournisseurController.ligneCmdeFournisseurs}" 
+                                 var="item"                             
+                                 paginator="true"
+                                 editable="true" 
+                                 rowKey="#{item.idCmdeFournisseur}"
+                                 rows="15"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 style="width: 98%;margin-left: 1%"
+                                 rowIndexVar="index"
+                                 emptyMessage="#{langue.tableau_vide}"
+                                 widgetVar="fonctionTable"
+                                 draggableColumns="true"
+                                 resizableColumns="true">
+
+                        <f:facet name="header"> 
+                            <h:outputText value="#{langue.element_de_commande}"/>
+                        </f:facet> 
+
+                        <p:column style="width: 25%" filterBy="#{item.idproduit.nom}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.article}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idproduit.nom}"/>
+                        </p:column>
+
+                        <p:column style="width: 23%" filterBy="#{item.idlot.numeroLot}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.lot}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idlot.numeroLot}"/>
+                        </p:column>
+
+                        <p:column style="width: 8%;text-align: center" headerText="#{langue.quantite}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{item.quantite}"/></f:facet>
+                                <f:facet  name="input">
+                                    <p:inputText required="true" value="#{item.quantite}">                                             
+                                        <p:ajax event="keyup" listener="#{commandeFournisseurController.updateTotal()}" update=":CommandeCreateForm:info_1,:CommandeCreateForm:info_2"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column filterBy="#{item.montant}" style="width: 10%;text-align: right" headerText="#{langue.prix_unitaire}">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{item.montant}" >
+                                        <f:convertNumber />
+                                    </h:outputText>    
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText required="true" value="#{item.montant}">
+                                        <f:convertNumber />
+                                        <p:ajax event="keyup" listener="#{commandeFournisseurController.updateTotal()}" update=":CommandeCreateForm:info_1,:CommandeCreateForm:info_2"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column style="width: 10%;text-align: right" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.montant_total}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.montant * item.quantite}">
+                                <f:convertNumber />
+                            </h:outputText>  
+                        </p:column>
+
+                        <p:column headerText="#{langue.modifier}" style="width: 10%;text-align: center">
+                            <p:rowEditor />
+                        </p:column>
+
+                        <p:column style="width: 10%;text-align: center" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.action}"/>
+                            </f:facet>
+                            <p:commandButton icon="ui-icon-trash">
+                                <p:ajax event="click" listener="#{commandeFournisseurController.removeProduit(index)}" update="datalist,:CommandeCreateForm:info_1,:CommandeCreateForm:info_2"/>
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <p:separator style="width: 98%;margin-left: 1%"/>
+
+                    <center>
+                        <p:panelGrid id="info_2" style="" columns="10">
+
+                            <p:outputLabel for="total" value="#{langue.total_ht}"/>
+                            <p:outputLabel id="total" value="#{commandeFournisseurController.total}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="tva" value="#{langue.tva}"/>
+                            <p:outputLabel id="tva" value="#{commandeFournisseurController.commandeFournisseur.montantTva}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="remise" value="#{langue.remise}"/>
+                            <p:outputLabel id="remise" value="#{commandeFournisseurController.commandeFournisseur.montantRemise}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="montant_ttc" value="#{langue.total_ttc}"/>
+                            <p:outputLabel id="montant_ttc" value="#{commandeFournisseurController.commandeFournisseur.montantTtc}" style="color:red">                               
+                                <f:convertNumber/>
+                            </p:outputLabel>
+
+                            <p:commandButton value="#{langue.calculer}" icon="fa fa-calculator" actionListener="#{commandeFournisseurController.updateTotal()}" update="info_2,info_1"/>
+                            <p:commandButton icon="ui-icon-plus" value="#{langue.ajouter_article}" update=":ArticleCreateForm"  actionListener="#{commandeFournisseurController.prepareCreateCommande()}"/>
+
+                        </p:panelGrid>
+                    </center>
+
+                    <p:separator/>
+
+                    <p:commandButton actionListener="#{commandeFournisseurController.create()}" style="float: right;" icon="ui-icon-check" value="#{langue.valider}" update="display,:FactureListerForm:datalist,:notify1" onclick="PF('AjaxNotifyDialog').show()"/>
+                    <p:commandButton style="float: left; color: red;" icon="ui-icon-close" value="#{langue.annuler}" oncomplete="PF('CommandeCreateDialog').hide()" partialSubmit="true"/>
+
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition>
+
+        <p:dialog id="ClientCreerDlg" 
+                  widgetVar="ClientCreerDialog" 
+                  modal="true" resizable="false" 
+                  appendTo="@(body)" 
+                  header="#{langue['Titre.Dlg.Creation']} : #{langue.client}" 
+                  closeOnEscape="true">
+
+            <h:form id="ClientCreerForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" columnClasses ="column">
+
+                        <p:outputLabel value="#{langue.code}" for="code" />
+                        <p:inputText style="width: 300px" id="code" value="#{clientController.client.code}" required="true" 
+                                     requiredMessage="#{langue.code} : #{langue['Conv.ValeurRequise']}">
+                            <p:ajax/>   
+                        </p:inputText>
+
+                        <p:outputLabel value="#{langue.nom} / #{langue.raison_sociale}" for="nom" />
+                        <p:inputTextarea style="width: 300px" cols="70" rows="4"  id="nom" value="#{clientController.client.nom}" required="true" 
+                                         requiredMessage="#{langue['Conv.Nom']}: #{langue['Conv.ValeurRequise']}">
+                            <p:ajax/>   
+                        </p:inputTextarea>
+
+                        <p:outputLabel value="#{langue.telephone_1}" for="contact_1" />
+                        <p:inputText id="contact_1" value="#{clientController.client.contact}" >
+                            <p:ajax/>   
+                        </p:inputText>
+
+                        <p:outputLabel value="#{langue.telephone_2}" for="contact_2" />
+                        <p:inputText id="contact_2" value="#{clientController.client.contact2}" >
+                            <p:ajax/>   
+                        </p:inputText>
+
+                        <p:outputLabel value="#{langue.email}" for="email" />
+                        <p:inputText id="email" value="#{clientController.client.email}" style="width: 300px" >
+                            <p:ajax/>   
+                        </p:inputText>
+
+                        <p:outputLabel value="#{langue.adresse}" for="adresse" />
+                        <p:inputText id="adresse" value="#{clientController.client.adresse}" style="width: 300px" >
+                            <p:ajax/>   
+                        </p:inputText>
+
+                    </p:panelGrid>
+
+                    <p:separator/>
+
+                    <p:commandButton style="float: right" actionListener="#{clientController.create()}" value="#{langue['Conv.Enregistrer']}" 
+                                     update="display,:ClientListerForm:datalist,:notify1" 
+                                     onclick="PF('AjaxNotifyDialog').show()" icon="ui-icon-check"/>
+
+                    <p:commandButton style="float: left" value="#{langue.annuler}" oncomplete="PF('ClientCreerDialog').hide()" icon="ui-icon-close"/>
+                </h:panelGroup>  
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:composition>
+
+    <!--<p:outputLabel  value="#{langue.district}" for="district"/>                       
+    <p:selectOneMenu filter="true" id="district" value="#{clientController.district.iddistrict}" required="#{langue.valeur_obligatoire}">
+        <f:selectItems value="#{clientController.districts}" var="dst" itemLabel="#{dst.nom}" itemValue="#{dst.iddistrict}" />
+        <p:ajax/>
+    </p:selectOneMenu>-->
+
+</html>

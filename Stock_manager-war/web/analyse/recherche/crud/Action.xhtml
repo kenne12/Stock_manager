@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form id="actionsForm">
+
+        <div class="footer-section">
+            
+            <h:panelGrid columns="12" >
+
+                <p:outputLabel value="#{langue.critere}" for="critere"/>
+                <p:selectOneMenu id="critere" value="#{rechercheController.critere}" required="true">
+                    <f:selectItem itemLabel="#{langue.tout}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{langue.mois}" itemValue="2"/>
+                    <f:selectItem itemLabel="#{langue.client}" itemValue="3"/>
+                    <f:selectItem itemLabel="#{langue.date}" itemValue="4"/>
+                    <f:selectItem itemLabel="#{langue.intervalle}" itemValue="5"/>
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" listener="#{rechercheController.updateCritere()}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu rendered="#{rechercheController.showClient}" value="#{rechercheController.client.idclient}" required="true">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{rechercheController.clients}" var="client" itemLabel="#{client.nom} #{client.prenom}" itemValue="#{client.idclient}"/>
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" listener="#{rechercheController.updateClient()}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu rendered="#{rechercheController.showMois}" value="#{rechercheController.anneeMois.idAnneeMois}" required="true">
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                    <f:selectItems value="#{rechercheController.anneeMoises}" var="mois" itemLabel="#{mois.idmois.nom} - #{mois.idannee.nom}" itemValue="#{mois.idAnneeMois}"/>
+                </p:selectOneMenu>
+
+                <p:selectOneMenu rendered="#{rechercheController.showDateInterval}" value="#{rechercheController.date_interval}" required="true">
+                    <f:selectItem itemLabel="#{langue.intervalle}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{langue.date}" itemValue="2"/>
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" listener="#{rechercheController.updateDateInterl()}"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel rendered="#{rechercheController.showDate}" value="#{langue.date}" for="date"/>
+                <p:calendar rendered="#{rechercheController.showDate}" id="date" value="#{rechercheController.date}" navigator="true" pattern="dd/MM/yyyy" required="true">
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" event="dateSelect" listener="#{rechercheController.updateDate()}" />
+                </p:calendar>
+
+                <p:outputLabel rendered="#{rechercheController.showDateDebut}" value="#{langue.debut}" for="date_debut"/>
+                <p:calendar rendered="#{rechercheController.showDateDebut}" id="date_debut" value="#{rechercheController.dateDebut}" navigator="true" pattern="dd/MM/yyyy" required="true">
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" event="dateSelect" listener="#{rechercheController.updateDate()}" />
+                </p:calendar>
+
+                <p:outputLabel rendered="#{rechercheController.showDateFin}" value="#{langue.fin}" for="date_fin"/>
+                <p:calendar rendered="#{rechercheController.showDateFin}" id="date_fin" value="#{rechercheController.dateFin}" navigator="true" pattern="dd/MM/yyyy" required="true">
+                    <p:ajax update="actionsForm,:FactureListerForm:datalist" event="dateSelect" listener="#{rechercheController.updateDate()}" />
+                </p:calendar>
+
+            </h:panelGrid>
+
+            <p:separator/>
+
+            <center>
+                <p:commandButton id="btn_search" 
+                                 update=":FactureListerForm:datalist,:notify1,imprimer" 
+                                 value="#{langue.rechercher}" 
+                                 onclick="PF('AjaxNotifyDialog').show()" 
+                                 actionListener="#{rechercheController.rechercher()}"/>
+
+                <p:commandButton id="imprimer" icon="ui-icon-print"  
+                                 value="#{langue['Conv.Imprimer']}" 
+                                 actionListener="#{rechercheController.printHistoric()}"
+                                 disabled="#{rechercheController.imprimer}"
+                                 update=":FactureImprimerDlg,:notify1"
+                                 onclick="PF('AjaxNotifyDialog').show()"/> 
+            </center>
+            <p:separator/>
+
+        </div>
+
+    </h:form>
+</ui:composition>
